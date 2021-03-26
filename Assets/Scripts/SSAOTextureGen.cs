@@ -32,14 +32,12 @@ public class SSAOTextureGen : MonoBehaviour
         AORenderTexture = RenderTexture.GetTemporary(Screen.width,Screen.height,0);
         blurRT = RenderTexture.GetTemporary(Screen.width, Screen.height, 0);
         Shader.SetGlobalTexture("_ScreenSpaceOcclusionTexture",AORenderTexture);
-        
-
     }
 
     private void OnEnable()
     {
         cam.depthTextureMode |= DepthTextureMode.DepthNormals;
-        
+        GenSampleKernal();
     }
     private void OnDisable()
     {
@@ -48,7 +46,6 @@ public class SSAOTextureGen : MonoBehaviour
 
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
-        GenSampleKernal();
         Graphics.Blit(src,rt);
         SSAOMaterial.SetTexture("_NoiseTex",noiseTexture);
         SSAOMaterial.SetFloat("_Height",(float)Screen.height);

@@ -20,7 +20,7 @@
 	};
 
 	//顶点阶段
-	#define MAX_SAMPLE_POINT_COUNT 64
+	#define MAX_SAMPLE_POINT_COUNT 32
 	//源画面
 	sampler2D _MainTex;
 	//噪声画面
@@ -29,7 +29,7 @@
 	sampler2D _CameraDepthNormalsTexture;
 	//反投影矩阵,用于获得相机视角每一个像素所对应的顶点坐标
 	float4x4 _InverseProjectionMatrix;
-	//采样点数组,最多128个
+	//采样点数组,最多32个
 	float4 _SamplePointArray[MAX_SAMPLE_POINT_COUNT];
 	float _SamplePointCount;
 	float _SampleKernelRadius;
@@ -77,15 +77,18 @@
 		float3 viewPos = pPointDepth * i.viewRay;
 
 		//铺平纹理
-		float2 noiseScale = float2(_Height, _Width);
+		float2 noiseScale = _ScreenParams;
 		float2 noiseUV = float2(i.uv.x * noiseScale.x, i.uv.y * noiseScale.y);
 		//采样噪声贴图
 		float3 randvec = tex2D(_NoiseTex, noiseUV).xyz;
 		//Gramm-Schimidt方法处理创建正交基
 		float3 tangent = normalize(randvec - viewNormal * dot(randvec, viewNormal));
 		float3 bitangent = cross(viewNormal, tangent);
-		//float3x3 TBN = float3x3(tangent, bitangent, viewNormal);
+		#if UNITY_UV_STARTS_AT_TOP
+		float3x3 TBN = float3x3(tangent, bitangent, viewNormal);
+		#else
 		float3x3 TBN = float3x3(tangent, viewNormal, bitangent);
+		#endif
 
 		int sampleCount = _SamplePointCount;
 		float oc = 0.0;
@@ -201,6 +204,7 @@
 			CGPROGRAM
 			#pragma vertex vert_ao
 			#pragma fragment frag_ao
+			#pragma UNITY_UV_STARTS_AT_TOP
 			ENDCG
 		}
 
@@ -210,6 +214,7 @@
 			CGPROGRAM
 			#pragma vertex vert_ao
 			#pragma fragment frag_blur
+			#pragma UNITY_UV_STARTS_AT_TOP
 			ENDCG
 		}
 
@@ -219,6 +224,7 @@
 			CGPROGRAM
 			#pragma vertex vert_ao
 			#pragma fragment frag_composite
+			#pragma UNITY_UV_STARTS_AT_TOP
 			ENDCG
 		}
 

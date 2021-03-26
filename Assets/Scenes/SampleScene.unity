@@ -214,6 +214,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &120206806
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Custom/MySSAO
+  m_Shader: {fileID: 4800000, guid: dd6b062352ce136408e285a9e0c6ba58, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &527861818
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,7 +802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99ac9a25abd533b4f94568508a724d96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SSAOMaterial: {fileID: 1875040626}
+  SSAOMaterial: {fileID: 120206806}
   sampleKernelRadius: 0.25
   samplePoint:
   - {x: 0.004433688, y: 0.0043960568, z: -0.0047872066, w: 0.0061724996}
@@ -842,9 +863,9 @@ MonoBehaviour:
   samplePointCount: 32
   noiseTexture: {fileID: 2800000, guid: cf257e93239576444b4dcb52ec2438b6, type: 3}
   blurRadius: 2
-  bilaterFilterStrength: 0.2
-  bias: 0.00005
-  strength: 500
+  bilaterFilterStrength: 0.5
+  bias: 0.00006
+  strength: 160
   rt: {fileID: 0}
 --- !u!1 &1466920175
 GameObject:
@@ -939,24 +960,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1875040626
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Custom/MySSAO
-  m_Shader: {fileID: 4800000, guid: dd6b062352ce136408e285a9e0c6ba58, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs: []
-    m_Floats: []
-    m_Colors: []

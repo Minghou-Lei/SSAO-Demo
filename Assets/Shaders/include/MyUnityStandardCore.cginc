@@ -268,27 +268,6 @@ struct AmbientOcclusionFactor
 };
 
 
-inline float4 SampleAmbientOcclusion(float2 normalizedScreenSpaceUV)
-{
-    float2 uv = UnityStereoTransformScreenSpaceTex(normalizedScreenSpaceUV);
-    return tex2D(_ScreenSpaceOcclusionTexture, normalizedScreenSpaceUV.xy);
-}
-
-inline AmbientOcclusionFactor GetScreenSpaceAmbientOcclusion(float2 normalizedScreenSpaceUV)
-{
-    AmbientOcclusionFactor aoFactor;
-    float4 factor = SampleAmbientOcclusion(normalizedScreenSpaceUV);
-    aoFactor.indirectAmbientOcclusion = factor;
-    aoFactor.directAmbientOcclusion = lerp(1.0, aoFactor.indirectAmbientOcclusion, 0);
-    return aoFactor;
-}
-
-inline float2 GetScreenUV(float2 screenPos)
-{
-    float2 uv = screenPos/_ScreenParams;
-    return uv;
-}
-
 inline UnityGI FragmentGI (FragmentCommonData s, half occlusion, half4 i_ambientOrLightmapUV, half atten, UnityLight light, bool reflections)
 {
     UnityGIInput d;
@@ -464,7 +443,24 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
     return o;
 }
 
-half4 fragForwardBaseInternal (VertexOutputForwardBase i)
+
+inline float4 SampleAmbientOcclusion(float2 normalizedScreenSpaceUV)
+{
+    float2 uv = UnityStereoTransformScreenSpaceTex(normalizedScreenSpaceUV);
+    return tex2D(_ScreenSpaceOcclusionTexture, uv);
+}
+
+inline AmbientOcclusionFactor GetScreenSpaceAmbientOcclusion(float2 normalizedScreenSpaceUV)
+{
+    AmbientOcclusionFactor aoFactor;
+    float4 factor = SampleAmbientOcclusion(normalizedScreenSpaceUV);
+    aoFactor.indirectAmbientOcclusion = factor;
+    aoFactor.directAmbientOcclusion = lerp(1.0, aoFactor.indirectAmbientOcclusion, 0);
+    return aoFactor;
+}
+
+
+half4 fragForwardBaseInternal (VertexOutputForwardBase i ,float4 wpos : WPOS)
 {
     UNITY_APPLY_DITHER_CROSSFADE(i.pos.xy);
 
@@ -477,32 +473,49 @@ half4 fragForwardBaseInternal (VertexOutputForwardBase i)
     UNITY_LIGHT_ATTENUATION(atten, i, s.posWorld);
 
     half occlusion = Occlusion(i.tex.xy);
-    UnityGI gi = FragmentGI (s, occlusion, i.ambientOrLightmapUV, atten, mainLight);
-    float2 screenPos = ComputeScreenPos(i.pos);
-    half2 uv;
-    uv.x = screenPos.x / _ScreenParams.x;
-    uv.y = screenPos.y / _ScreenParams.y;
     
-    AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(uv);
+    float4 screenPos = ComputeScreenPos(UnityWorldToClipPos(IN_WORLDPOS(i)));
+    float2 uv = screenPos.xy / screenPos.w;
+
+    
+    float ao = tex2D(_ScreenSpaceOcclusionTexture, uv);
+    
+    
+    AmbientOcclusionFactor aoFactor;
+    aoFactor.indirectAmbientOcclusion = ao.x;
+    aoFactor.directAmbientOcclusion = lerp(1.1, aoFactor.indirectAmbientOcclusion, 0.5);
+
+    mainLight.color *= aoFactor.directAmbientOcclusion;
+    
+    UnityGI gi = FragmentGI (s, occlusion, i.ambientOrLightmapUV, atten, mainLight);
+
+    
     gi.indirect.specular.rgb *= aoFactor.indirectAmbientOcclusion;
     gi.indirect.diffuse.rgb *= aoFactor.indirectAmbientOcclusion;
     gi.light.color.rgb *= aoFactor.directAmbientOcclusion;
-
-    half4 c = UNITY_BRDF_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, gi.light, gi.indirect);
+    
+    
+    half4 c = UNITY_BRDF_PBS(
+        s.diffColor,
+        s.specColor,
+        s.oneMinusReflectivity,
+        s.smoothness,
+        s.normalWorld,
+        -s.eyeVec,
+        gi.light,
+        gi.indirect
+        );
     c.rgb += Emission(i.tex.xy);
 
     UNITY_EXTRACT_FOG_FROM_EYE_VEC(i);
     UNITY_APPLY_FOG(_unity_fogCoord, c.rgb);
 
-    
-
-    
     return OutputForward (c, s.alpha);
 }
 
 half4 fragForwardBase (VertexOutputForwardBase i) : SV_Target   // backward compatibility (this used to be the fragment entry function)
 {
-    return fragForwardBaseInternal(i);
+    return fragForwardBaseInternal(i,0);
 }
 
 // ------------------------------------------------------------------
