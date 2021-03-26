@@ -2,7 +2,6 @@
 {
 	Properties
 	{
-
 	}
 	CGINCLUDE
 	#include "UnityCG.cginc"

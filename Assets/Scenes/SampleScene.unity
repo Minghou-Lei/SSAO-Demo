@@ -171,7 +171,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf681d6abe07f824e8ff84d6999c5dce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -265,7 +265,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf681d6abe07f824e8ff84d6999c5dce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -359,7 +359,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf681d6abe07f824e8ff84d6999c5dce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -545,7 +545,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf681d6abe07f824e8ff84d6999c5dce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -600,8 +600,9 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
-  - component: {fileID: 963194230}
   - component: {fileID: 963194231}
+  - component: {fileID: 963194230}
+  - component: {fileID: 963194232}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -775,12 +776,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99ac9a25abd533b4f94568508a724d96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SSAOMaterial: {fileID: 1828310917}
+  SSAOMaterial: {fileID: 1875040626}
   sampleKernelRadius: 0.25
   samplePoint:
   - {x: 0.004433688, y: 0.0043960568, z: -0.0047872066, w: 0.0061724996}
@@ -822,6 +823,29 @@ MonoBehaviour:
   AOTexture: 0
   bias: 0.00005
   strength: 60
+--- !u!114 &963194232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90b9b01d0d6f8d744b2b7849bad763a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AORenderTexture: {fileID: 0}
+  SSAOMaterial: {fileID: 0}
+  sampleKernelRadius: 0.3
+  samplePoint: []
+  samplePointCount: 32
+  noiseTexture: {fileID: 2800000, guid: cf257e93239576444b4dcb52ec2438b6, type: 3}
+  blurRadius: 2
+  bilaterFilterStrength: 0.2
+  bias: 0.00005
+  strength: 500
+  rt: {fileID: 0}
 --- !u!1 &1466920175
 GameObject:
   m_ObjectHideFlags: 0
@@ -872,7 +896,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf681d6abe07f824e8ff84d6999c5dce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -915,7 +939,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1828310917
+--- !u!21 &1875040626
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0

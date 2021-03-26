@@ -59,8 +59,13 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\SSAO.cs" />
+     <Compile Include="Assets\Scripts\SSAOTextureGen.cs" />
      <Compile Include="Assets\Scripts\SSAOWithCommandBuffer.cs" />
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
+     <None Include="Assets\Shaders\include\MyUnityStandardCoreForward.cginc" />
+     <None Include="Assets\Shaders\MyStandard.shader" />
+     <None Include="Assets\Shaders\include\MyUnityPBSLighting.cginc" />
+     <None Include="Assets\Shaders\include\MyUnityStandardCore.cginc" />
      <None Include="Assets\Shaders\MySSAO.shader" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/Github projects/SSAO-Demo/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

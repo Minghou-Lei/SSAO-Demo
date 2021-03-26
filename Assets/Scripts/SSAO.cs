@@ -47,6 +47,8 @@ public class SSAO : MonoBehaviour
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
         GenSampleKernal();
+        RenderTexture rawImage = RenderTexture.GetTemporary(src.width, src.height, 0);
+        Graphics.Blit(src,rawImage);
         AORenderTexture = RenderTexture.GetTemporary(src.width, src.height, 0);
         SSAOMaterial.SetTexture("_NoiseTex",noiseTexture);
         SSAOMaterial.SetFloat("_Height",(float)Screen.height);
@@ -71,30 +73,30 @@ public class SSAO : MonoBehaviour
         }
         else
         {
+            SSAOMaterial.SetTexture("_MainTex",rawImage);
             Graphics.Blit(blurRT,AORenderTexture,SSAOMaterial,(int)ShaderPipline.BilateralFilter);
             SSAOMaterial.SetTexture("_AOTex",AORenderTexture);
             Graphics.Blit(src,dest,SSAOMaterial,(int)ShaderPipline.Composite);
         }
         
-        RenderTexture.ReleaseTemporary(AORenderTexture);
-        RenderTexture.ReleaseTemporary(blurRT);
+        //RenderTexture.ReleaseTemporary(AORenderTexture);
+        //RenderTexture.ReleaseTemporary(blurRT);
         
     }
 
     void GenSampleKernal()
     {
-        if(samplePointCount == samplePoint.Count)
+        if (samplePointCount == samplePoint.Count)
             return;
         samplePoint.Clear();
         for (int i = 0; i < samplePointCount; ++i)
         {
-            var vector = new Vector4(Random.Range(-1f, 1f), Random.Range(0f, 1f), Random.Range(-1f, 1f),1f).normalized;
+            var vector = new Vector4(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(0f, 1f), 1f).normalized;
             //拟合二次方程
             var scale = (float) i / samplePointCount;
             scale = Mathf.Lerp(0.01f, 1f, scale * scale);
             vector *= scale;
             samplePoint.Add(vector);
         }
-        
     }
 }
