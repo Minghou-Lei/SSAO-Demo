@@ -43,11 +43,7 @@
 
 	//输出阶段
 	sampler2D _AOTex;
-
-	float _Height; //屏幕的高
-	float _Width; //屏幕的宽
 	
-
 	//顶点阶段
 	v2f vert_ao(appdata v)
 	{
@@ -77,7 +73,7 @@
 		float3 viewPos = pPointDepth * i.viewRay;
 
 		//铺平纹理
-		float2 noiseScale = _ScreenParams;
+		float2 noiseScale = _ScreenParams.xy;
 		float2 noiseUV = float2(i.uv.x * noiseScale.x, i.uv.y * noiseScale.y);
 		//采样噪声贴图
 		float3 randvec = tex2D(_NoiseTex, noiseUV).xyz;
@@ -87,7 +83,7 @@
 		#if UNITY_UV_STARTS_AT_TOP
 		float3x3 TBN = float3x3(tangent, bitangent, viewNormal);
 		#else
-		float3x3 TBN = float3x3(tangent, viewNormal, bitangent);
+		float3x3 TBN = float3x3(tangent, -viewNormal, bitangent);
 		#endif
 
 		int sampleCount = _SamplePointCount;
@@ -110,7 +106,7 @@
 
 			//确定该取样点的权重
 			float rangeCheck = smoothstep(0.0, 1.0, _SampleKernelRadius / abs(viewPos.z - samplePointDepth));
-			oc += (pPointDepth >= samplePointDepth + _Bias ? 1.0 : 0.0) * rangeCheck;
+			oc += (pPointDepth > samplePointDepth + _Bias ? 1.0 : 0.0) * rangeCheck;
 		}
 		oc = 1.0 - oc / sampleCount;
 		col.rgb = pow(oc, _Strength);
@@ -129,7 +125,7 @@
 		ori.rgb *= ao.r;
 		return ori;
 	}
-
+	
 	float3 GetNormal(float2 uv)
 	{
 		//获得法线贴图

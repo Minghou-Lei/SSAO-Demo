@@ -444,22 +444,6 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 }
 
 
-inline float4 SampleAmbientOcclusion(float2 normalizedScreenSpaceUV)
-{
-    float2 uv = UnityStereoTransformScreenSpaceTex(normalizedScreenSpaceUV);
-    return tex2D(_ScreenSpaceOcclusionTexture, uv);
-}
-
-inline AmbientOcclusionFactor GetScreenSpaceAmbientOcclusion(float2 normalizedScreenSpaceUV)
-{
-    AmbientOcclusionFactor aoFactor;
-    float4 factor = SampleAmbientOcclusion(normalizedScreenSpaceUV);
-    aoFactor.indirectAmbientOcclusion = factor;
-    aoFactor.directAmbientOcclusion = lerp(1.0, aoFactor.indirectAmbientOcclusion, 0);
-    return aoFactor;
-}
-
-
 half4 fragForwardBaseInternal (VertexOutputForwardBase i ,float4 wpos : WPOS)
 {
     UNITY_APPLY_DITHER_CROSSFADE(i.pos.xy);
@@ -483,15 +467,14 @@ half4 fragForwardBaseInternal (VertexOutputForwardBase i ,float4 wpos : WPOS)
     
     AmbientOcclusionFactor aoFactor;
     aoFactor.indirectAmbientOcclusion = ao.x;
-    aoFactor.directAmbientOcclusion = lerp(1.1, aoFactor.indirectAmbientOcclusion, 0.5);
+    aoFactor.directAmbientOcclusion = lerp(.8, aoFactor.indirectAmbientOcclusion, .7);
 
     mainLight.color *= aoFactor.directAmbientOcclusion;
     
     UnityGI gi = FragmentGI (s, occlusion, i.ambientOrLightmapUV, atten, mainLight);
 
-    
-    gi.indirect.specular.rgb *= aoFactor.indirectAmbientOcclusion;
-    gi.indirect.diffuse.rgb *= aoFactor.indirectAmbientOcclusion;
+    //gi.indirect.specular.rgb *= aoFactor.indirectAmbientOcclusion;
+    //gi.indirect.diffuse.rgb *= aoFactor.indirectAmbientOcclusion;
     gi.light.color.rgb *= aoFactor.directAmbientOcclusion;
     
     

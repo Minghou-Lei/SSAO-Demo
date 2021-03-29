@@ -8,7 +8,7 @@ public class SSAOTextureGen : MonoBehaviour
 {
     private Camera cam;
     private Shader shader;
-    private RenderTexture blurRT;
+    public RenderTexture blurRT;
     
     public RenderTexture AORenderTexture;
     public Material SSAOMaterial;
@@ -28,9 +28,9 @@ public class SSAOTextureGen : MonoBehaviour
         SSAOMaterial = new Material(shader);
         cam = GetComponent<Camera>();
         cam.forceIntoRenderTexture = true;
-        rt = RenderTexture.GetTemporary(Screen.width,Screen.height,0);
-        AORenderTexture = RenderTexture.GetTemporary(Screen.width,Screen.height,0);
-        blurRT = RenderTexture.GetTemporary(Screen.width, Screen.height, 0);
+        rt =RenderTexture.GetTemporary(Screen.width,Screen.height,0);
+        AORenderTexture =new RenderTexture(Screen.width,Screen.height,0);
+        blurRT =new RenderTexture(Screen.width, Screen.height, 0);
         Shader.SetGlobalTexture("_ScreenSpaceOcclusionTexture",AORenderTexture);
     }
 
@@ -43,31 +43,36 @@ public class SSAOTextureGen : MonoBehaviour
     {
         cam.depthTextureMode &= ~DepthTextureMode.DepthNormals;
     }
-
+    
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
-        Graphics.Blit(src,rt);
+        //Graphics.Blit(src, rt);
         SSAOMaterial.SetTexture("_NoiseTex",noiseTexture);
-        SSAOMaterial.SetFloat("_Height",(float)Screen.height);
-        SSAOMaterial.SetFloat("_Width",(float)Screen.width);
         SSAOMaterial.SetMatrix("_InverseProjectionMatrix", cam.projectionMatrix.inverse);
         SSAOMaterial.SetVectorArray("_SamplePointArray",samplePoint.ToArray());
         SSAOMaterial.SetFloat("_SamplePointCount",samplePointCount);
         SSAOMaterial.SetFloat("_SampleKernelRadius",sampleKernelRadius);
-        Graphics.Blit(rt,AORenderTexture,SSAOMaterial,0);
+        SSAOMaterial.SetFloat("_Strength",strength);
+        Graphics.Blit(src,AORenderTexture,SSAOMaterial,0);
+
         SSAOMaterial.SetFloat("_BilaterFilterFactor",1f-bilaterFilterStrength);
         SSAOMaterial.SetVector("_BlurRadius",new Vector4(blurRadius,0,0,0));
         SSAOMaterial.SetFloat("_Bias",bias);
-        SSAOMaterial.SetFloat("_Strength",strength);
+        SSAOMaterial.SetTexture("_MainTex",AORenderTexture);
         Graphics.Blit(AORenderTexture,blurRT,SSAOMaterial,1);
-        SSAOMaterial.SetVector("_BlurRadius",new Vector4(0,blurRadius,0,0));
-        Graphics.Blit(blurRT,dest,SSAOMaterial,1);
-        Graphics.Blit(rt,dest);
         
+        SSAOMaterial.SetVector("_BlurRadius",new Vector4(0,blurRadius,0,0));
+        SSAOMaterial.SetTexture("_MainTex",AORenderTexture);
+        Graphics.Blit(blurRT,AORenderTexture,SSAOMaterial,1);
+        
+        //Graphics.Blit(blurRT,dest,SSAOMaterial,1);
+        Graphics.Blit(src,dest);
+        
+        /*
         RenderTexture.ReleaseTemporary(rt);
         RenderTexture.ReleaseTemporary(AORenderTexture);
         RenderTexture.ReleaseTemporary(blurRT);
-
+        */
     }
     
     void GenSampleKernal()
@@ -77,10 +82,11 @@ public class SSAOTextureGen : MonoBehaviour
         samplePoint.Clear();
         for (int i = 0; i < samplePointCount; ++i)
         {
-            var vector = new Vector4(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(0f, 1f), 1f).normalized;
+            var vector = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(0f, 1f)).normalized;
             //拟合二次方程
             var scale = (float) i / samplePointCount;
-            scale = Mathf.Lerp(0.01f, 1f, scale * scale);
+            scale = Mathf.Lerp(0.001f, 1f, scale * scale);
+            //scale *= 0.5f;
             vector *= scale;
             samplePoint.Add(vector);
         }

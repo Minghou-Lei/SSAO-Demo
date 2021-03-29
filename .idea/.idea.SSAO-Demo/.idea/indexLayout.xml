@@ -19,7 +19,6 @@
       <Path>.vs</Path>
       <Path>Library</Path>
       <Path>Logs</Path>
-      <Path>Temp</Path>
       <Path>obj</Path>
       <Path>开始上手 fce1c7e9b2824406b97d5ae03ecdbe83</Path>
     </explicitExcludes>
